@@ -1,2 +1,2 @@
 # textris
-Text processor
+Processing and visualization of named entities in text.

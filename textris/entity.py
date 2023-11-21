@@ -1,5 +1,6 @@
-
-
+from . import question as q
+import numpy as np
+from copy import copy
 
 
 class Entity:
@@ -241,3 +242,51 @@ class UMLSText(SpanText):
         
         anno = self.get_umls_annotation()
         return anno.to_dict()
+    
+
+# def umls_annotate(text, pipeline, linker=None):
+#     ''' Generate UMLS entity annotations.
+#     '''
+    
+#     ner_text = pipeline(text)
+#     umls_text = UMLSText(ner_text, linker=linker)
+#     umls_anno = umls_text.get_umls_annotation()
+    
+#     return umls_anno
+    
+class QAnnotator(q.Question):
+    
+    def __init__(self, **kwargs):
+        super(QAnnotator, self).__init__(**kwargs)
+        
+    def annotate(self, pipeline, part='options', linker=None):
+        ''' Annotate selected text with UMLS entity tags.
+        '''
+        
+        # Annotate the options in the question text.
+        if part == 'options':
+            text_annos = copy(self.options)
+            for opt_id, option in self.options.items():            
+                try:
+                    anno = UMLSText.from_text(option,
+                                              pipeline=pipeline,
+                                              linker=linker)
+                    text_annos[opt_id] = anno.annotation
+                except:
+                    text_annos[opt_id] = None
+                    
+        # Annotate the question context.
+        elif part == 'question':
+            text_annos = {}
+            try:
+                anno = UMLSText.from_Text(self.question,
+                                          pipeline=pipeline,
+                                          linker=linker)
+                text_annos['question'] = anno.annotation
+            except:
+                text_annos['question'] = None
+        
+        else:
+            raise NotImplementedError
+            
+        self.annotation = text_annos

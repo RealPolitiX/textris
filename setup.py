@@ -16,7 +16,7 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
     
 setup(
     name="textris",
-    version="0.0.2",
+    version="0.1.0",
     url="https://github.com/RealPolitiX/textris",
 
     author="R. Patrick Xian",
